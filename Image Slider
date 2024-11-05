@@ -1,208 +1,181 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Rotating Image Slider with Taj Mahal</title>
-    <style>
-        /* General Reset */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Arial', sans-serif;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fade Transition Image Slider with Thumbnails</title>
+  <style>
+    /* Basic Reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-        body {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            background: #f0f0f0;
-        }
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+    }
 
-        /* Slider Container Styling */
-        .slider-container {
-            position: relative;
-            width: 90%;
-            max-width: 600px;
-            height: 400px;
-            perspective: 1200px;
-        }
+    /* Slider Container */
+    .slider-container {
+      position: relative;
+      width: 80%;
+      max-width: 700px;
+      overflow: hidden;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
 
-        /* Slider Wrapper */
-        .slider-wrapper {
-            width: 100%;
-            height: 100%;
-            position: absolute;
-            display: flex;
-            transform-style: preserve-3d;
-            transform: rotateY(0deg);
-            transition: transform 1s ease-in-out;
-        }
+    /* Slides */
+    .slides {
+      position: relative;
+    }
 
-        /* Individual Slide */
-        .slide {
-            width: 100%;
-            height: 100%;
-            position: absolute;
-            backface-visibility: hidden;
-            border-radius: 10px;
-            overflow: hidden;
-        }
+    .slide {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      opacity: 0;
+      transition: opacity 1s ease;
+    }
 
-        /* Rotating Angles for Each Slide */
-        .slide:nth-child(1) {
-            transform: rotateY(0deg) translateZ(400px);
-        }
+    /* Show the first slide by default */
+    .slide.active {
+      opacity: 1;
+      position: relative;
+      z-index: 1;
+    }
 
-        .slide:nth-child(2) {
-            transform: rotateY(45deg) translateZ(400px);
-        }
+    .slide img {
+      width: 100%;
+      border-radius: 10px;
+      display: block;
+    }
 
-        .slide:nth-child(3) {
-            transform: rotateY(90deg) translateZ(400px);
-        }
+    /* Thumbnails */
+    .thumbnails {
+      display: flex;
+      justify-content: center;
+      margin-top: 10px;
+    }
 
-        .slide:nth-child(4) {
-            transform: rotateY(135deg) translateZ(400px);
-        }
+    .thumbnail {
+      width: 60px;
+      margin: 0 5px;
+      cursor: pointer;
+      opacity: 0.6;
+      transition: opacity 0.3s;
+      border-radius: 5px;
+      border: 2px solid transparent;
+    }
 
-        .slide:nth-child(5) {
-            transform: rotateY(180deg) translateZ(400px);
-        }
+    .thumbnail:hover, .thumbnail.active {
+      opacity: 1;
+      border-color: #3498db;
+    }
 
-        .slide:nth-child(6) {
-            transform: rotateY(225deg) translateZ(400px);
-        }
+    .thumbnail img {
+      width: 100%;
+      border-radius: 5px;
+    }
 
-        .slide:nth-child(7) {
-            transform: rotateY(270deg) translateZ(400px);
-        }
+    /* Caption */
+    .caption {
+      position: absolute;
+      bottom: 15px;
+      left: 15px;
+      color: #fff;
+      background-color: rgba(0, 0, 0, 0.5);
+      padding: 8px;
+      border-radius: 5px;
+      font-size: 1rem;
+    }
 
-        .slide:nth-child(8) {
-            transform: rotateY(315deg) translateZ(400px);
-        }
-
-        /* Slide Image */
-        .slide img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        /* Navigation Controls */
-        .nav-button {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            background: rgba(0, 0, 0, 0.5);
-            color: #fff;
-            border: none;
-            padding: 15px;
-            cursor: pointer;
-            font-size: 18px;
-            transition: background 0.3s ease;
-            z-index: 1;
-        }
-
-        .nav-button:hover {
-            background: rgba(0, 0, 0, 0.7);
-        }
-
-        .nav-button.prev {
-            left: -60px; /* Move navigation buttons outside of slider */
-            border-radius: 5px 0 0 5px;
-        }
-
-        .nav-button.next {
-            right: -60px; /* Move navigation buttons outside of slider */
-            border-radius: 0 5px 5px 0;
-        }
-
-        @media (max-width: 600px) {
-            .slider-container {
-                height: 300px;
-            }
-
-            .nav-button {
-                padding: 10px;
-                font-size: 14px;
-            }
-
-            .nav-button.prev, .nav-button.next {
-                left: -40px;
-                right: -40px;
-            }
-        }
-    </style>
+    /* Responsive Styling */
+    @media (max-width: 600px) {
+      .thumbnail {
+        width: 50px;
+      }
+      .caption {
+        font-size: 0.9rem;
+      }
+    }
+  </style>
 </head>
-
 <body>
-    <div class="slider-container">
-        <div class="slider-wrapper" id="sliderWrapper">
-            <!-- Slide 1: Taj Mahal Image 1 -->
-            <div class="slide">
-                <img src="https://www.tipsoftravelling.com/wp-content/uploads/2021/04/leh-ladakh.jpg" alt="Taj Mahal Image 1">
-            </div>
-            <!-- Slide 2: Taj Mahal Image 2 -->
-            <div class="slide">
-                <img src="https://cdn.pixabay.com/photo/2014/11/21/03/44/taj-mahal-540736_960_720.jpg" alt="Taj Mahal Image 2">
-            </div>
-            <!-- Slide 3: Taj Mahal Image 3 -->
-            <div class="slide">
-                <img src="https://cdn.pixabay.com/photo/2016/01/19/18/00/taj-mahal-1156606_960_720.jpg" alt="Taj Mahal Image 3">
-            </div>
-            <!-- Slide 4: Taj Mahal Image 4 -->
-            <div class="slide">
-                <img src="https://cdn.pixabay.com/photo/2018/10/01/09/01/taj-mahal-3711410_960_720.jpg" alt="Taj Mahal Image 4">
-            </div>
-            <!-- Slide 5: Taj Mahal Image 5 -->
-            <div class="slide">
-                <img src="https://cdn.pixabay.com/photo/2019/08/06/10/59/taj-mahal-4381647_960_720.jpg" alt="Taj Mahal Image 5">
-            </div>
-            <!-- Slide 6: Taj Mahal Image 6 -->
-            <div class="slide">
-                <img src="https://cdn.pixabay.com/photo/2017/03/28/23/36/taj-mahal-2183440_960_720.jpg" alt="Taj Mahal Image 6">
-            </div>
-            <!-- Slide 7: Taj Mahal Image 7 -->
-            <div class="slide">
-                <img src="https://cdn.pixabay.com/photo/2016/11/19/14/00/taj-mahal-1839023_960_720.jpg" alt="Taj Mahal Image 7">
-            </div>
-            <!-- Slide 8: Taj Mahal Image 8 -->
-            <div class="slide">
-                <img src="https://cdn.pixabay.com/photo/2020/01/19/08/14/taj-mahal-4774246_960_720.jpg" alt="Taj Mahal Image 8">
-            </div>
-        </div>
-        <!-- Navigation Buttons -->
-        <button class="nav-button prev" onclick="prevSlide()">&#10094;</button>
-        <button class="nav-button next" onclick="nextSlide()">&#10095;</button>
+
+  <div class="slider-container">
+    <!-- Slide Images -->
+    <div class="slides">
+      <div class="slide active">
+        <img src="https://lp-cms-production.imgix.net/2019-06/75322601.jpg?fit=crop&q=40&sharp=10&vib=20&auto=format&ixlib=react-8.6.4">
+        <div class="caption">This is the caption for Image 1</div>
+      </div>
+      <div class="slide">
+        <img src="https://static.toiimg.com/photo/66122027.cms">
+        <div class="caption">This is the caption for Image 2</div>
+      </div>
+      <div class="slide">
+        <img src="https://wallpapercave.com/wp/wp7029155.jpg">
+        <div class="caption">This is the caption for Image 3</div>
+      </div>
     </div>
 
-    <script>
-        let currentIndex = 0;
-        const totalSlides = 8;
-        const sliderWrapper = document.getElementById('sliderWrapper');
 
-        // Function to go to the previous slide
-        function prevSlide() {
-            currentIndex = (currentIndex - 1 + totalSlides) % totalSlides;
-            updateSlider();
-        }
+    <!-- Thumbnails for Navigation -->
+    <div class="thumbnails">
+      <div class="thumbnail active" onclick="setSlide(0)">
+        <img src="https://lp-cms-production.imgix.net/2019-06/75322601.jpg?fit=crop&q=40&sharp=10&vib=20&auto=format&ixlib=react-8.6.4">
+      </div>
+      <div class="thumbnail" onclick="setSlide(1)">
+        <img src="https://static.toiimg.com/photo/66122027.cms">
+      </div>
+      <div class="thumbnail" onclick="setSlide(2)">
+        <img src="https://wallpapercave.com/wp/wp7029155.jpg">
+      </div>
+    </div>
+  </div>
 
-        // Function to go to the next slide
-        function nextSlide() {
-            currentIndex = (currentIndex + 1) % totalSlides;
-            updateSlider();
-        }
+  <script>
+    // Current active slide index
+    let currentSlide = 0;
 
-        // Function to update the slider position with rotation effect
-        function updateSlider() {
-            const angle = currentIndex * -45; // Each slide rotates by 45 degrees
-            sliderWrapper.style.transform = `rotateY(${angle}deg)`;
+    // Get all slides and thumbnails
+    const slides = document.querySelectorAll(".slide");
+    const thumbnails = document.querySelectorAll(".thumbnail");
+
+    // Function to show a slide by index
+    function showSlide(index) {
+      slides.forEach((slide, i) => {
+        slide.classList.remove("active");
+        thumbnails[i].classList.remove("active");
+        if (i === index) {
+          slide.classList.add("active");
+          thumbnails[i].classList.add("active");
         }
-    </script>
+      });
+    }
+
+    // Set the slide based on the selected thumbnail index
+    function setSlide(index) {
+      currentSlide = index;
+      showSlide(currentSlide);
+    }
+
+    // Auto-advance the slide every 5 seconds
+    function autoSlide() {
+      currentSlide = (currentSlide + 1) % slides.length;
+      showSlide(currentSlide);
+    }
+
+    // Start auto-sliding
+    setInterval(autoSlide, 7000);
+  </script>
 </body>
-
 </html>
